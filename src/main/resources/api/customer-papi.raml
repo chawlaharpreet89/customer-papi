@@ -1,0 +1,132 @@
+#%RAML 1.0
+title: customer-papi
+description: This API lists, creates, updates and deletes a customer.
+version: 1.0.0 
+
+mediaType: 
+- application/json
+
+uses:
+  customer-type: libraries/lib-customerType.raml
+  common: libraries/lib-common.raml
+
+securedBy: [common.client-id-enforcement]
+
+/customer:
+  description: The Customer resource stores information about first name, last name and addresses of a customer.
+  
+  get:
+    description: This endpoint retrieves a list of customers.
+    responses:
+      200:
+        description: List of customers.
+        body:
+          application/json:
+            example: !include examples/response/get-customer-200.json
+            type: customer-type.CustomerResponse
+      400:
+        description: No customer found.
+        body:
+          application/json:
+            example: !include examples/response/error-400.json
+            type: common.Error
+      500:
+        description: Internal Server Error.
+        body:
+          application/json:
+            example: !include examples/response/error-500.json
+            type: common.Error            
+  post:
+    description: This endpoint creates a new customer.
+    body:
+      application/json:
+        type: customer-type.Customer
+        example: !include examples/request/post-customer.json
+          
+    responses:
+      201:
+        description: Customer created.
+        body:
+          application/json:
+            example: !include examples/response/post-customer-200.json
+            type: common.Success
+            properties:
+              data?:
+                type: object
+                properties:
+                  message: 
+                    type : string
+                    example: "Customer created successfully."     
+      500:
+        description: Internal Server Error.
+        body:
+          application/json:
+            example: !include examples/response/error-500.json
+            type: common.Error    
+    
+  /{id}:
+    patch:
+      description: This endpoint updates an existing customer's address. 
+      body:
+        application/json:
+          example: !include examples/request/patch-customer.json
+          type: object
+          properties:
+            addresses: customer-type.Addresses
+
+      responses:
+        200:
+          description: Customer updated.
+          body:
+            application/json:
+              example: !include examples/response/patch-customer-200.json
+              type: common.Success
+              properties:
+                data?:
+                  type: object
+                  properties:
+                    message: 
+                      type : string
+                      example: "Customer updated successfully."
+        400:
+          description: No customer found.
+          body:
+            application/json:
+              example: !include examples/response/error-400.json
+              type: common.Error
+        500:
+          description: Internal Server Error.
+          body:
+            application/json:
+              example: !include examples/response/error-500.json
+              type: common.Error    
+                    
+    delete:  
+      description: This endpoint deletes a customer with the given id.
+      responses:
+        200:
+          description: Customer deleted.
+          body:
+            application/json:
+              example: !include examples/response/delete-customer-200.json
+              type: common.Success
+              properties:
+                data?:
+                  type: object
+                  properties:
+                    message: 
+                      type : string
+                      example: "Customer deleted successfully."
+        400:
+          description: No customer found.
+          body:
+            application/json:
+              example: !include examples/response/error-400.json
+              type: common.Error
+        500:
+          description: Internal Server Error.
+          body:
+            application/json:
+              example: !include examples/response/error-500.json
+              type: common.Error    
+      

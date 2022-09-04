@@ -1,0 +1,33 @@
+{
+    "customerId": "1",
+    "firstName": "John",
+    "lastName": "Bairstow",
+    "addresses": {
+        "postal": [
+            {
+                "type": "Home",
+                "firstName": "John",
+                "lastName": "Bairstow",
+                "addressLine1": "123 Block",
+                "addressLine2": "321 Test Street",
+                "city": "Nowhere",
+                "state": "Nostate",
+                "ZIP": "12345",
+                "country": "Nocountry"
+            }
+        ],
+        "phone": [
+            {
+                "type": "Home",
+                "countryCode": "+12",
+                "number": "1234567891"
+            }
+        ],
+        "email": [
+            {
+                "type": "Work",
+                "email": "test@test.com"
+            }
+        ]
+    }
+}

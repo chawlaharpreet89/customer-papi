@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="database-create-tables" doc:id="cdf5063f-4fc1-4c84-aeff-bf78546d7957" >
+		<http:listener doc:name="Listener" doc:id="9813033c-0668-45e7-b3c6-151c90537a21" config-ref="customer-papi-httpListenerConfig" path="${db.baseURI}/${db.create}"/>
+		<db:execute-ddl doc:id="fa25aec1-0155-45cb-992c-6edde68d9b40" config-ref="DatabaseConfig" doc:name="Execute DDL to create tables">
+			<db:sql ><![CDATA[CREATE TABLE customer (customerId int,firstName VARCHAR(20),lastName VARCHAR(20), PRIMARY KEY(customerId));
+CREATE TABLE address(customerId int,type VARCHAR(4), firstName VARCHAR(20), lastName VARCHAR(20), addressLine1 VARCHAR(50), 
+addressLine2 VARCHAR(50), city VARCHAR(20), state VARCHAR(20), country VARCHAR(20), ZIP VARCHAR(20),PRIMARY KEY (customerId));
+CREATE TABLE phone(customerId int, type VARCHAR(4), countryCode VARCHAR(3), number VARCHAR(10), PRIMARY KEY(customerId));
+CREATE TABLE email(customerId int, type VARCHAR(4), email VARCHAR(50),PRIMARY KEY(customerId));]]></db:sql>
+		</db:execute-ddl>
+	</flow>
+	<flow name="database-drop-tables" doc:id="3ea46ae6-b37e-47d1-a070-1509939ac98b" >
+		<http:listener doc:name="Listener" doc:id="011bb9f2-4ce2-47ce-af9b-86aeec603de9" config-ref="customer-papi-httpListenerConfig" path="${db.baseURI}/${db.drop}"/>
+		<db:execute-ddl doc:name="Execute DDL to drop tables" doc:id="d67451e4-ac63-4ac9-984a-04fb4c3a40d0" config-ref="DatabaseConfig">
+			<db:sql ><![CDATA[DROP TABLE customer;
+DROP TABLE address;
+DROP TABLE phone;
+DROP TABLE email;]]></db:sql>
+		</db:execute-ddl>
+	</flow>
+	<flow name="database-insert-data" doc:id="79607575-ab2e-4274-a635-9b632c49b21e" >
+		<http:listener doc:name="Listener" doc:id="c5afe0f2-1270-4cc0-8834-47ed291278c6" config-ref="customer-papi-httpListenerConfig" path="${db.baseURI}/${db.insert}" />
+		<db:insert doc:name="Insert values in DB" doc:id="b6f7f1d3-b393-48f1-b866-6d4f17114d77" config-ref="DatabaseConfig">
+			<db:sql ><![CDATA[INSERT INTO customer(customerId,firstName,lastName) VALUES (1, 'John', 'Bairstow');
+INSERT INTO address(customerId,type , firstName, lastName, addressLine1, 
+addressLine2 , city, state, country, ZIP) VALUES(1,'HOME','Johny','Bairstow','123 Block', '987 Street', 'Nocity', 'Nostate', 'Nocountry','12345');
+INSERT INTO phone(customerId, type, countryCode, number ) VALUES(1,'HOME','+12','1234567890');
+INSERT INTO email(customerId, type, email) VALUES(1,'WORK','test@test.com');
+
+INSERT INTO customer(customerId,firstName,lastName) VALUES (2, 'Mark', 'Fehlinger');
+INSERT INTO address(customerId,type , firstName, lastName, addressLine1, 
+addressLine2 , city, state, country, ZIP) VALUES(2,'HOME','Mark','Fehli','321 Block', '123 Street', 'testcity', 'teststate', 'testcountry','54321');
+INSERT INTO phone(customerId, type, countryCode, number ) VALUES(2,'HOME','+12','9087654321');
+INSERT INTO email(customerId, type, email) VALUES(2,'WORK','test1@test1.com');
+
+INSERT INTO customer(customerId,firstName,lastName) VALUES (3, 'Marcus', 'Stoinis');
+INSERT INTO address(customerId,type , firstName, lastName, addressLine1, 
+addressLine2 , city, state, country, ZIP) VALUES(3,'HOME','Marcus','Stoinis','32145 Block', '12345 Street', 'testcity', 'teststate', 'testcountry','54321');
+INSERT INTO phone(customerId, type, countryCode, number ) VALUES(3,'HOME','+12','7654321890');
+INSERT INTO email(customerId, type, email) VALUES(3,'WORK','testo2@test2.com');]]></db:sql>
+		</db:insert>
+	</flow>
+	<flow name="database-select" doc:id="6072fbb7-260d-4a09-8108-60af4d73c29d" >
+		<http:listener doc:name="Listener" doc:id="08b15fc5-bffa-4340-8ba4-ed688fe5e8d6" config-ref="customer-papi-httpListenerConfig" path="${db.baseURI}/${db.select}" />
+		<db:select doc:name="Select from customer,address,phone, email tables" doc:id="f665aaa3-6326-445d-8151-af0e6211be98" config-ref="DatabaseConfig">
+			<db:sql ><![CDATA[SELECT * from address]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="15565b0b-143c-44d9-b471-aebe8be90221" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

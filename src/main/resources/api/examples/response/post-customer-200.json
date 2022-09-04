@@ -1,0 +1,11 @@
+{
+  "timestamp": "2021-06-04T17:29:07.516+05:30",
+  "version": "1.0.0",
+  "apiName": "customer-papi",
+  "source": "Database",
+  "success": true,
+  "correlationId": "431f9bf1-c52c-11eb-a505-005056882674",
+  "data": {
+    "message": "Customer created successfully."
+  }
+}

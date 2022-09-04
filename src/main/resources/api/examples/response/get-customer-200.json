@@ -1,0 +1,48 @@
+{
+  "timestamp": "2021-06-04T17:29:07.516+05:30",
+  "version": "1.0.0",
+  "apiName": "customer-papi",
+  "source": "Database",
+  "success": true,
+  "correlationId": "431f9bf1-c52c-11eb-a505-005056882674",
+  "data": {
+    "customers": [
+      {
+        "customerId": "987654321",
+        "firstName": "John",
+        "lastName": "Bairstow",
+        "addresses": {
+          "postal": [
+            {
+              "type": "Home",
+              "isPrimary": true,
+              "firstName": "John",
+              "lastName": "Bairstow",
+              "addressLine1": "123 Block",
+              "addressLine2": "321 Test Street",
+              "city": "Nowhere",
+              "state": "Nostate",
+              "ZIP": "12345",
+              "country": "Nocountry"
+            }
+          ],
+          "phone": [
+            {
+              "type": "Home",
+              "countryCode": "+12",
+              "number": "1234567891",
+              "isPrimary": true
+            }
+          ],
+          "email": [
+            {
+              "type": "Work",
+              "email": "test@test.com",
+              "isPrimary": false
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

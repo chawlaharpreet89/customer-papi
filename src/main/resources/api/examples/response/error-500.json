@@ -1,0 +1,12 @@
+{
+  "success": false,
+  "apiName": "customer-papi",
+  "version": "1.0.0",
+  "source": "Database",
+  "correlationId": "61c721e0-cdbf-11eb-89ef-005056882674",
+  "timestamp": "2022-08-31T08:21:22.394926Z",
+  "errorDetails": {
+    "code": "500",
+    "description": "Internal Server Error"
+  }
+}

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:netsuite="http://www.mulesoft.org/schema/mule/netsuite" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/netsuite http://www.mulesoft.org/schema/mule/netsuite/current/mule-netsuite.xsd">
+	<sub-flow name="customer-get-list" doc:id="65f51d7e-eb7a-44dc-b10d-71b887267879" >
+		<flow-ref doc:name="db-get-customer-list" doc:id="695c4d25-813f-44f8-8c2f-1c7a9dec9f14" name="database-get-customer-list" />
+		<flow-ref doc:name="responseMessageHandler" doc:id="b9d0d461-2c1b-4b7c-a387-d63506a7dc88" name="customer-response-messageHandler"/>
+	</sub-flow>
+	<sub-flow name="customer-post-new" doc:id="6de621d4-232f-4d06-b1ec-afb47879f568" >
+		<ee:transform doc:name="set customerId" doc:id="31140aa8-765e-45be-a41e-684ea3aa93e3" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="customerId" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.originalPayload.customerId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="db-post-customer" doc:id="cfc1701d-953c-45c8-bc8f-cf0218dc2fb6" name="database-post-customer" />
+		<flow-ref doc:name="responseMessageHandler" doc:id="7217773d-f252-4fb4-a26f-d0e1f493bd45" name="customer-response-messageHandler" />
+	</sub-flow>
+	<sub-flow name="customer-delete" doc:id="e7f5cbce-190f-4ccb-af04-675435720815" >
+		<ee:transform doc:name="set customerId" doc:id="37a932cb-086f-40ae-ad3e-addebd92a858" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="customerId" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.uriParams.'id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="database-customer-delete" doc:id="29c85d1b-a70c-42b6-be91-567ce552e7ba" name="database-customer-delete" />
+		<flow-ref doc:name="responseMessage handler" doc:id="3d159712-9746-4ec8-978e-17b0fca75f90" name="customer-response-messageHandler" />
+	</sub-flow>
+	<sub-flow name="customer-update" doc:id="5d36e70a-1789-4e8a-bc6f-87b9fc232f71" >
+		<ee:transform doc:name="set customerId" doc:id="87a41966-9db3-4c09-a92c-415264fac4c6" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="customerId" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.uriParams.'id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="db-patch-customer" doc:id="2baa57a3-5cae-4713-b692-f0dd767b3b15" name="database-patch-customer" />
+		<flow-ref doc:name="responseMessage handler" doc:id="6d1808bd-d55a-4b05-a4bd-cca8c447cd4c" name="customer-response-messageHandler"/>
+	</sub-flow>
+	
+	<sub-flow name="database-customer-delete" doc:id="c8bea265-e3c0-4400-a3aa-c8a0e6e22f6b" >
+		<try doc:name="Try" doc:id="737994e3-db42-4470-8e87-0d8cb8713bfe" >
+			<db:delete doc:name="Delete" doc:id="84534586-1aab-4e51-8214-a6c0a440dd84" config-ref="DatabaseConfig">
+			<db:sql><![CDATA[#['DELETE from customer where customerId = $(vars.customerId);
+DELETE from address where customerId = $(vars.customerId);
+DELETE from phone where customerId = $(vars.customerId);
+DELETE from email where customerId = $(vars.customerId);']]]></db:sql>
+		</db:delete>
+			<choice doc:name="is record found?" doc:id="42512799-7744-4810-bd01-45089ba2b1fd" >
+				<when expression="#[payload != 0]">
+					<set-variable value="200" doc:name="Set statusCode" doc:id="47cb4b92-ef86-4d83-a15b-ae79c8186113" variableName="statusCode" />
+				</when>
+				<otherwise >
+					<raise-error doc:name="Raise error" doc:id="debfb002-3096-45f3-80ac-d6ca6227679c" type="APP:NO_DATA" description="CustomerId does not exist." />
+				</otherwise>
+			</choice>
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f324779e-963a-4020-90fc-c5ff0d8200d7" >
+					<ee:transform doc:name="set error status code" doc:id="3a66f2b4-c540-4498-9c94-2e4178e280f8" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.errorType.asString == "APP:NO_DATA") "400"
+else
+"500"]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.errorType.asString == "APP:NO_DATA") "400"
+else
+"500"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set error payload" doc:id="b28a8a6e-cd18-429d-8a1b-40f3864c87a2" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.errorType.asString == "APP:NO_DATA")
+{
+	errorMessage : error.description
+}
+else
+"Unknown Error."]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<flow name="database-patch-customer" doc:id="8bb7fcf7-e246-4656-8c3d-9af3e7f887ce" >
+		<choice doc:name="is postal update?" doc:id="b84ceb59-1742-43b1-9f16-1ea6ebdf39e5">
+			<when expression="#[!isEmpty(vars.originalPayload.addresses.postal )]">
+				<db:bulk-update doc:name="Bulk update address" doc:id="2af4fdd5-b6fa-4b26-8c7d-91afe4781678" config-ref="DatabaseConfig">
+			<db:bulk-input-parameters><![CDATA[#[vars.originalPayload.addresses.postal]]]></db:bulk-input-parameters>
+			<db:sql><![CDATA[#['UPDATE address SET firstName = :firstName, lastName = :lastName, addressLine1 = :addressLine1, addressLine2 = :addressLine2, city= :city, state= :state,country = :country,ZIP = :ZIP where customerId= $(vars.customerId) and type = :type']
+]]></db:sql>
+		</db:bulk-update>
+			</when>
+		</choice>
+		<choice doc:name="is phone update and record found?" doc:id="c49d294c-c9f0-4043-82ab-80082d48e2c7">
+			<when expression="#[!isEmpty(vars.originalPayload.addresses.phone) and payload[0] != 0]">
+				<db:bulk-update doc:name="Bulk update phone" doc:id="78ce30c2-430f-4424-b56d-0a80b308b353" config-ref="DatabaseConfig">
+					<db:bulk-input-parameters><![CDATA[#[vars.originalPayload.addresses.phone]]]></db:bulk-input-parameters>
+					<db:sql><![CDATA[#['UPDATE phone SET  countryCode= :countryCode, number= :number where customerId= $(vars.customerId) and type = :type']
+]]></db:sql>
+				</db:bulk-update>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="0c31c1dc-dffa-43c4-9bc3-2eaddb592e40" type="APP:NO_DATA" description="CustomerId does not exist."/>
+			</otherwise>
+		</choice>
+		<choice doc:name="is email update?" doc:id="a5639af0-8f78-482c-9915-45442d247e13">
+			<when expression="#[!isEmpty(vars.originalPayload.addresses.email)]">
+				<db:bulk-update doc:name="Bulk update email" doc:id="f0f4406d-5794-4cdc-8283-0ace11d99274" config-ref="DatabaseConfig">
+					<db:bulk-input-parameters><![CDATA[#[vars.originalPayload.addresses.email]]]></db:bulk-input-parameters>
+					<db:sql><![CDATA[#['UPDATE email SET email= :email where customerId= $(vars.customerId) and type = :type']
+]]></db:sql>
+				</db:bulk-update>
+			</when>
+		</choice>
+		<set-variable value="200" doc:name="Set statusCode" doc:id="25e95229-f7e5-435b-837c-53af17ee5cd2" variableName="statusCode" />
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="52da8a99-30a4-4c41-8742-c954b6e82546" >
+				<ee:transform doc:name="set error status code" doc:id="cc6e6858-cabf-46b4-9364-f035d691e56f" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.errorType.asString == "APP:NO_DATA") "400"
+else
+"500"]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.errorType.asString == "APP:NO_DATA") "400"
+else
+"500"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="set error payload" doc:id="33f23a83-6306-47dc-9ecc-0c07422c7fc6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.errorType.asString == "APP:NO_DATA")
+{
+	errorMessage : error.description
+}
+else
+"Unknown Error."]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<sub-flow name="database-post-customer" doc:id="69491c8c-5896-4cf0-8b7f-06a0a74fe86f" >
+		<try doc:name="Try" doc:id="07ab2d96-6396-4bc0-80f7-579b0c34b2af">
+			<db:insert doc:name="Insert in customer table" doc:id="c71912c9-ef4d-41af-b500-b010f906c12f" config-ref="DatabaseConfig">
+			<db:sql><![CDATA[INSERT INTO CUSTOMER(CUSTOMERID,FIRSTNAME,LASTNAME) VALUES(:custId,:firstName,:lastName)]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	custId : vars.originalPayload.customerId,
+	firstName : vars.originalPayload.firstName,
+	lastName : vars.originalPayload.lastName
+}]]]></db:input-parameters>
+		</db:insert>
+			<db:bulk-insert doc:name="Bulk insert into address" doc:id="10b56984-865e-4537-bcb0-9143f173358a" config-ref="DatabaseConfig">
+			<db:bulk-input-parameters><![CDATA[#[vars.originalPayload.addresses.postal]]]></db:bulk-input-parameters>
+			<db:sql><![CDATA[#['INSERT INTO address(customerId,type , firstName, lastName, addressLine1,addressLine2 , city, state, country, ZIP) VALUES($(vars.customerId),:type,:firstName,:lastName,:addressLine1,:addressLine2,:city,:state,:country,:ZIP);']]]></db:sql>
+		</db:bulk-insert>
+			<db:bulk-insert doc:name="Bulk insert into phone" doc:id="ec3b82a7-3d04-42a0-b05b-3d31fdd91218" config-ref="DatabaseConfig">
+			<db:bulk-input-parameters><![CDATA[#[vars.originalPayload.addresses.phone]]]></db:bulk-input-parameters>
+			<db:sql><![CDATA[#['INSERT INTO phone(customerId,type, countryCode,number) VALUES($(vars.customerId),:type,:countryCode,:number);']]]></db:sql>
+		</db:bulk-insert>
+			<db:bulk-insert doc:name="Bulk insert into email" doc:id="ed103966-104a-4296-a2ba-e9c0b3b4eaf6" config-ref="DatabaseConfig">
+			<db:bulk-input-parameters><![CDATA[#[vars.originalPayload.addresses.email]]]></db:bulk-input-parameters>
+			<db:sql><![CDATA[#['INSERT INTO email(customerId,type, email) VALUES($(vars.customerId),:type,:email);']]]></db:sql>
+		</db:bulk-insert>
+			<set-variable value="200" doc:name="set statusCode" doc:id="25c18dc5-872b-4236-9b90-b9ab1ddb4d9d" variableName="statusCode" />
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="eb6afad2-0d97-44c6-ae30-cca39d5ffa6f">
+					<ee:transform doc:name="set error status code" doc:id="11d74133-c61f-4bf4-b010-c308aae32951">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="statusCode"><![CDATA[%dw 2.0
+output application/json
+---
+if(error.description contains "primary key violation") "400"
+else
+"500"]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.description contains "primary key violation") "400"
+else
+"500"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="set error payload" doc:id="b2cc9c4c-7118-47ed-9487-decc905a60b6" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.description contains "primary key violation")
+{
+	errorMessage : "CustomerId already exists."
+}
+else
+"500"]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<sub-flow name="database-get-customer-list" doc:id="5f19faad-12ea-4e36-a6d2-a5eb6a3fcd07" >
+		<try doc:name="Try" doc:id="fa8cae64-27ec-41c0-8c7e-e69469731d09" >
+			<db:select doc:name="get customer list" doc:id="86c56343-ad39-4ca7-97d1-fc1713dba34b" config-ref="DatabaseConfig" target="customerList" targetValue="#[output application/json --- payload]" >
+				<db:sql ><![CDATA[select * from customer]]></db:sql>
+			</db:select>
+			<db:select doc:name="get customer address list" doc:id="2ee4aa2e-4f44-46e2-87e0-d231140b5984" config-ref="DatabaseConfig" target="addressList" targetValue="#[output application/json --- payload]" >
+				<db:sql ><![CDATA[select * from address]]></db:sql>
+				<db:parameter-types />
+			</db:select>
+			<db:select doc:name="get customer phone list" doc:id="84def8ad-99f9-4b29-8e65-f1b2199a1232" config-ref="DatabaseConfig" target="phoneList" targetValue="#[output application/json --- payload]" >
+				<db:sql ><![CDATA[select * from phone]]></db:sql>
+			</db:select>
+			<db:select doc:name="get customer email list" doc:id="695f3588-a6b2-4abf-aea6-ab9e55465c85" config-ref="DatabaseConfig" target="emailList" targetValue="#[output application/json --- payload]" >
+				<db:sql ><![CDATA[select * from email]]></db:sql>
+			</db:select>
+			<set-variable value="200" doc:name="set statusCode" doc:id="4ad55fef-7d04-4229-9116-e6a28457c320" variableName="statusCode" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7f740dea-09f4-47b3-af24-4aac44931d60" >
+					<ee:transform doc:name="set error status code" doc:id="53b2366e-dc50-4662-95ca-591aa238421e" >
+						<ee:message />
+						<ee:variables >
+							<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.description contains "primary key violation") "400"
+else
+"500"]]></ee:set-variable>
+							<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/json
+---
+if(error.description contains "primary key violation") "400"
+else
+"500"]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+<sub-flow name="customer-response-messageHandler" doc:id="985992bd-3c38-4bbc-8440-f8ec0f0b818f" >
+		<choice doc:name="is success?" doc:id="23f314a5-5c64-48fc-b17f-d9e755ca0178" >
+			<when expression="vars.statusCode != '200'">
+				<ee:transform doc:name="error payload" doc:id="5da5207b-efd3-4d9a-a6cb-f3441a0e2eef" >
+					<ee:message >
+						<ee:set-payload resource="dwl/error-response.dwl" />
+					
+</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.httpCallType == "GET"]'>
+				<ee:transform doc:name="customer list response" doc:id="2d806565-5ec4-4793-af57-304d92a46db2">
+					<ee:message>
+						<ee:set-payload resource="dwl/get-customer-response.dwl" />
+					
+</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.httpCallType == "POST"]'>
+				<ee:transform doc:name="post customer response" doc:id="6374e6ff-18aa-4084-8b98-b8e36fee1175">
+					<ee:message>
+						<ee:set-payload resource="dwl/post-customer-response.dwl" />
+					
+</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[vars.httpCallType == "PATCH"]'>
+				<ee:transform doc:name="patch customer response" doc:id="14ab6b64-471e-4c03-aa31-1a13304e2c98" >
+					<ee:message >
+						<ee:set-payload resource="dwl/patch-customer-response.dwl" />
+					
+</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="delete customer response" doc:id="8f624361-79ad-4c02-b3e6-6545a570e95a">
+					<ee:message>
+						<ee:set-payload resource="dwl/delete-customer-response.dwl" />
+					
+</ee:message>
+				</ee:transform>
+			
+</otherwise>
+		</choice>
+	</sub-flow>
+	
+</mule>

@@ -1,0 +1,287 @@
+{
+	"info": {
+		"_postman_id": "9594f6d5-72e8-4c56-a701-0ed4d7ac0281",
+		"name": "Customer PAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Database",
+			"item": [
+				{
+					"name": "Create Tables",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "client_id",
+								"value": "test",
+								"type": "default"
+							},
+							{
+								"key": "client_secret",
+								"value": "test",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8092/db/create",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8092",
+							"path": [
+								"db",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Drop Tables",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "client_id",
+								"value": "test",
+								"type": "default"
+							},
+							{
+								"key": "client_secret",
+								"value": "test",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8092/db/drop",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8092",
+							"path": [
+								"db",
+								"drop"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Select from Tables",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "client_id",
+								"value": "test",
+								"type": "default"
+							},
+							{
+								"key": "client_secret",
+								"value": "test",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8092/db/select",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8092",
+							"path": [
+								"db",
+								"select"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert into Tables",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "client_id",
+								"value": "test",
+								"type": "default"
+							},
+							{
+								"key": "client_secret",
+								"value": "test",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8092/db/insert",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8092",
+							"path": [
+								"db",
+								"insert"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Customer List",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "client_id",
+						"value": "test",
+						"type": "default"
+					},
+					{
+						"key": "client_secret",
+						"value": "test",
+						"type": "default"
+					},
+					{
+						"key": "correlationid",
+						"value": "test-id",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8092/api/customer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8092",
+					"path": [
+						"api",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post New Customer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "client_id",
+						"value": "test",
+						"type": "default"
+					},
+					{
+						"key": "client_secret",
+						"value": "test",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"customerId\": \"4\",\r\n  \"firstName\": \"Harpreet\",\r\n  \"lastName\": \"Chawla\",\r\n  \"addresses\": {\r\n    \"postal\": [\r\n      {\r\n        \"type\": \"Home\",\r\n        \"firstName\": \"Harpreet\",\r\n        \"lastName\": \"Chawla\",\r\n        \"addressLine1\": \"123 Block\",\r\n        \"addressLine2\": \"321 Test Street\",\r\n        \"city\": \"Nowhere\",\r\n        \"state\": \"Nostate\",\r\n        \"ZIP\": \"12345\",\r\n        \"country\": \"Nocountry\"\r\n      }\r\n    ],\r\n    \"phone\": [\r\n      {\r\n        \"type\": \"Home\",\r\n        \"countryCode\": \"+12\",\r\n        \"number\": \"1234567891\"\r\n      }\r\n    ],\r\n    \"email\": [\r\n      {\r\n        \"type\": \"Home\",\r\n        \"email\": \"test@test.com\"\r\n      }\r\n    ]\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8092/api/customer",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8092",
+					"path": [
+						"api",
+						"customer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post New Customer Copy",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "client_id",
+						"value": "test",
+						"type": "default"
+					},
+					{
+						"key": "client_secret",
+						"value": "test",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"addresses\": {\r\n    \"postal\": [\r\n      {\r\n        \"type\": \"Home\",\r\n        \"firstName\": \"John1111111111111\",\r\n        \"lastName\": \"Bairstow\",\r\n        \"addressLine1\": \"123 Block\",\r\n        \"addressLine2\": \"321 Test Street\",\r\n        \"city\": \"Nowhere\",\r\n        \"state\": \"Nostate\",\r\n        \"ZIP\": \"12345\",\r\n        \"country\": \"Nocountry\"\r\n      }\r\n    ],\r\n    \"phone\": [\r\n      {\r\n        \"type\": \"Home\",\r\n        \"countryCode\": \"+12\",\r\n        \"number\": \"1111567891\"\r\n      }\r\n    ],\r\n    \"email\": [\r\n      {\r\n        \"type\": \"Home\",\r\n        \"email\": \"tes1111111t@test.com\"\r\n      }\r\n    ]\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8092/api/customer/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8092",
+					"path": [
+						"api",
+						"customer",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Customer",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "client_id",
+						"value": "test",
+						"type": "default"
+					},
+					{
+						"key": "client_secret",
+						"value": "test",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8092/api/customer/4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8092",
+					"path": [
+						"api",
+						"customer",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

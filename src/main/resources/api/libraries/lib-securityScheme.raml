@@ -1,0 +1,10 @@
+#%RAML 1.0 SecurityScheme
+type: x-client-id-enforcement
+description: This trait is used to enforce Client ID and Secret at the header for API request.
+displayName: Client ID Enforcement
+describedBy:
+  headers:
+    client_id:
+      type: string
+    client_secret:
+      type: string

@@ -1,0 +1,112 @@
+#%RAML 1.0 Library
+uses:
+  common: lib-common.raml
+types:
+  CustomerResponse:
+    type: common.Success
+    properties:
+      data?:
+        type: object
+        properties:
+          customers:
+            type: array
+            items: Customer
+
+
+
+  Customer:
+    type: object
+    properties:
+      customerId:
+        type: string
+        example: "987654321"
+      firstName:
+        type: string
+        example: "John"
+      lastName:
+        type: string
+        example: "Bairstow"
+      addresses:
+        type: Addresses
+        
+  Addresses:
+    type: object
+    properties:
+      postal?:
+        type: Postal
+      phone?:
+        type: Phone
+      email?: 
+        type: Email
+
+  Email:
+    type: array
+    items:
+      properties:
+        type:
+          type: string
+          example: "Work"
+        email:
+          type: string
+          example: "test@test.com"
+        isPrimary?:
+          type: boolean
+          example: false
+
+  Phone:
+    type: array
+    items:
+      properties:
+        type:
+          type: string
+          example: "Home"
+        countryCode:
+          type: string
+          example: "+12"
+        number: 
+          type: string
+          example: "1234567891"
+          maxLength: 10
+        isPrimary?:
+          type: boolean
+          example: true    
+        
+  Postal:
+    type: array
+    items:
+      properties:
+        type: 
+          type: string
+          example: "Home"
+        isPrimary?:
+          type: boolean
+          example: true     
+        firstName:
+          type: string
+          example: "John"
+          maxLength: 20
+        lastName:
+          type: string
+          example: "Bairstow" 
+          maxLength: 20 
+        addressLine1:
+          type: string
+          example: "123 Block"
+        addressLine2?:
+          type: string
+          example: "321 Test Street"
+        city:
+          type: string
+          example: "Nowhere"
+        state:
+          type: string
+          example: "Nostate"
+        ZIP:
+          type: string
+          example: "12345" 
+        country:
+          type: string
+          example: "Nocountry"
+
+                     
+              

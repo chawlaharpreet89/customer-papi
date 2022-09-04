@@ -1,0 +1,21 @@
+app:  
+  name : 'customer-papi'
+  version: '1.0.0'
+  baseURI: '/api/*'
+  
+http:
+  host: '0.0.0.0' 
+  private:
+    port: '8092'
+    
+db:
+  config:
+    URL: 'jdbc:h2:file:C:/db/h2Test' #change this path
+    driver: 'org.h2.Driver'
+  baseURI: '/db'  
+  create: 'create'
+  drop: 'drop'
+  insert: 'insert'
+  select: 'select'
+  
+  

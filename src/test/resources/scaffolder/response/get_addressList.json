@@ -1,0 +1,13 @@
+[
+  {
+    "ZIP": "12345",
+    "COUNTRY": "Nocountry",
+    "FIRSTNAME": "John",
+    "CITY": "Nocity",
+    "CUSTOMERID": 1,
+    "ADDRESSLINE2": "987 Street",
+    "ADDRESSLINE1": "123 Block",
+    "STATE": "Nostate",
+    "TYPE": "HOME",
+    "LASTNAME": "Bairstow"
+  }]

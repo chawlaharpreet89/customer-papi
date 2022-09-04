@@ -1,0 +1,75 @@
+#%RAML 1.0 Library
+usage: All common API response types
+securitySchemes:
+  client-id-enforcement: !include lib-securityScheme.raml
+
+types:
+  Success:
+    displayName: Success Response
+    type: object
+    properties:
+      success:
+        description: Success/Failure flag
+        type: boolean
+        example: true
+      apiName:
+        description: API Name
+        type: string
+        example: "customer-papi"
+      source:
+        description: API source name
+        type: string  
+        example: "Database"
+      version:
+        description: Build version
+        type: string
+        example: "1.0.0"
+      correlationId:
+        description: uniquely generated id for tracking request
+        type: string
+        example: "431f9bf1-c52c-11eb-a505-005056882674"
+      timestamp:
+        description: Occurence Time
+        type: datetime
+        example: 2021-06-04T17:29:07.516+05:30
+
+
+  Error:
+      displayName: Error Response
+      type: object
+      properties:
+        success:
+          description: Success/Failure flag
+          type: boolean
+          example: false
+        apiName:
+          description: API Name
+          type: string
+          example: "customer-papi"
+        version:
+          description: Build version
+          type: string
+          example: "1.0.0"  
+        source:
+          description: API source name
+          type: string
+          example: "Database" 
+        correlationId:
+          description: uniquely generated id for tracking request
+          type: string  
+          example: 61c721e0-cdbf-11eb-89ef-005056882674
+        timestamp:
+          description: Occurence Time
+          type: datetime
+          example: 2022-08-31T08:21:22.394926Z 
+        errorDetails:
+          type: object
+          properties:  
+            code: 
+              description: Error code
+              type: string
+              example: "400"
+            description:
+              description: Error description
+              type: string
+              example: "No Data Found"       
